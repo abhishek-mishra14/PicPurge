@@ -29,18 +29,18 @@ uv sync
 ### Process Media
 ```bash
 # Standard run
-picpurge process /path/to/images_videos
+uv run picpurge process /path/to/images_videos
 
 # Dry-run (preview only)
-picpurge process /path/to/images_videos --dry-run
+uv run picpurge process /path/to/images_videos --dry-run
 
 # Custom thresholds
-picpurge process /path/to/images_videos --blur-threshold 80 --hash-threshold 3
+uv run picpurge process /path/to/images_videos --blur-threshold 80 --hash-threshold 3
 ```
 
 ### Archive for S3
 ```bash
-picpurge archive /path/to/images_videos --output collection.zip
+uv run picpurge archive /path/to/images_videos --output collection.zip
 ```
 
 ## 🧪 Testing
