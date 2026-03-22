@@ -49,8 +49,9 @@ uv run python -m pytest tests/ -v
 ```
 
 ## 🏗 Architecture
+- `src/dedup/cli.py` — Modern Typer CLI with Rich progress
 - `src/dedup/analyzer.py` — Blur scoring, hashing, screenshot detection, format classification
 - `src/dedup/metadata.py` — EXIF extraction and duplicate ranking
 - `src/dedup/core.py` — Hash grouping and file movement
 - `src/dedup/ui.py` — Tkinter comparison UI
-- `main.py` — Typer CLI with Rich progress
+- `main.py` — Thin shim for local development (`uv run main.py`)
