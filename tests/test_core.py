@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from src.dedup import core
+from dedup import core
 
 
 def test_group_by_hash_near_duplicates():
@@ -83,7 +83,8 @@ def test_move_to_skipped_empty_list(tmp_path):
 
 
 def test_move_nonexistent_file(tmp_path):
-    """Should silently skip files that don't exist."""
+    """Should crash if requested to move a file that doesn't exist."""
     root = tmp_path / "root"
     root.mkdir()
-    core.move_to_skipped(["/nonexistent/file.jpg"], str(root))
+    with pytest.raises(FileNotFoundError):
+        core.move_to_skipped(["/nonexistent/file.jpg"], str(root))

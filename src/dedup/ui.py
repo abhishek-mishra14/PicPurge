@@ -34,32 +34,28 @@ def prompt_duplicate_resolution(group: list[str]) -> list[str]:
         col = ttk.Frame(img_frame, padding=5)
         col.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        try:
-            ext = path.lower()
-            if ext.endswith(('.mp4', '.mov')):
-                ttk.Label(col, text="[Video File]").pack()
-            else:
-                img = Image.open(path)
-                img.thumbnail((300, 300))
-                photo = ImageTk.PhotoImage(img)
-                photos.append(photo)
-                tk.Label(col, image=photo).pack()
-        except Exception as e:
-            ttk.Label(col, text=f"[Preview Error]\n{e}").pack()
-            
+        ext = path.lower()
+        if ext.endswith(('.mp4', '.mov')):
+            ttk.Label(col, text="[Video File]").pack()
+        else:
+            img = Image.open(path)
+            img.thumbnail((300, 300))
+            photo = ImageTk.PhotoImage(img)
+            photos.append(photo)
+            tk.Label(col, image=photo).pack()
+
         size_mb = os.path.getsize(path) / (1024 * 1024)
         ttk.Label(col, text=f"{os.path.basename(path)}\n{size_mb:.2f} MB").pack()
         ttk.Button(col, text="Keep This", command=lambda p=path: on_keep(p)).pack()
-        
+
     ttk.Button(frame, text="Keep All", command=keep_all).pack(pady=10)
-    
+
     root.mainloop()
     root.destroy()
-    
-    # default safety fallback
+
     if not keep_list:
-        keep_list.append(group[0])
-        
+        raise ValueError("No files were selected to keep. Resolution must be explicit.")
+
     return keep_list
 
 def prompt_skipped_files(skipped: list[str]):

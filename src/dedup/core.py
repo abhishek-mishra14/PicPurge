@@ -51,15 +51,14 @@ def move_to_skipped(files_to_skip: list[str], base_dir: str, folder_name: str = 
     os.makedirs(skipped_dir, exist_ok=True)
     
     for file_path in files_to_skip:
-        if os.path.exists(file_path):
-            file_name = os.path.basename(file_path)
-            dest = os.path.join(skipped_dir, file_name)
-            
-            # handle naming collisions in the skipped directory
-            counter = 1
-            while os.path.exists(dest):
-                name, ext = os.path.splitext(file_name)
-                dest = os.path.join(skipped_dir, f"{name}_{counter}{ext}")
-                counter += 1
-                
-            shutil.move(file_path, dest)
+        file_name = os.path.basename(file_path)
+        dest = os.path.join(skipped_dir, file_name)
+
+        # handle naming collisions in the skipped directory
+        counter = 1
+        while os.path.exists(dest):
+            name, ext = os.path.splitext(file_name)
+            dest = os.path.join(skipped_dir, f"{name}_{counter}{ext}")
+            counter += 1
+
+        shutil.move(file_path, dest)

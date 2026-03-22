@@ -18,8 +18,8 @@ def test_process_e2e(tmp_path, image_factory):
     shutil.copy(image_factory("b.jpg", mode="sharp"), test_dir / "b.jpg")  # dup of a
     shutil.copy(image_factory("blur.jpg", mode="blurry"), test_dir / "blur.jpg")
 
-    with patch("src.dedup.ui.prompt_duplicate_resolution") as mock_ui, \
-         patch("src.dedup.ui.prompt_skipped_files"):
+    with patch("dedup.ui.prompt_duplicate_resolution") as mock_ui, \
+         patch("dedup.ui.prompt_skipped_files"):
         mock_ui.side_effect = lambda group: [group[0]]
         result = runner.invoke(app, ["process", str(test_dir)])
 
@@ -45,7 +45,7 @@ def test_process_single_file(tmp_path, image_factory):
     d.mkdir()
     shutil.copy(image_factory("only.jpg", mode="sharp"), d / "only.jpg")
 
-    with patch("src.dedup.ui.prompt_skipped_files"):
+    with patch("dedup.ui.prompt_skipped_files"):
         result = runner.invoke(app, ["process", str(d)])
     assert result.exit_code == 0
     assert (d / "only.jpg").exists()
@@ -73,7 +73,7 @@ def test_process_custom_thresholds(tmp_path, image_factory):
     d.mkdir()
     shutil.copy(image_factory("a.jpg", mode="sharp"), d / "a.jpg")
 
-    with patch("src.dedup.ui.prompt_skipped_files"):
+    with patch("dedup.ui.prompt_skipped_files"):
         result = runner.invoke(app, ["process", str(d),
                                      "--blur-threshold", "9999",
                                      "--hash-threshold", "0"])

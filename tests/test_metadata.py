@@ -1,6 +1,6 @@
 import os
 import pytest
-from src.dedup import metadata
+from dedup import metadata
 
 
 def test_get_metadata_image(image_factory):
@@ -13,9 +13,8 @@ def test_get_metadata_image(image_factory):
 
 
 def test_get_metadata_nonexistent():
-    meta = metadata.get_metadata("/nonexistent/file.jpg")
-    assert meta["width"] == 0
-    assert meta["height"] == 0
+    with pytest.raises(FileNotFoundError):
+        metadata.get_metadata("/nonexistent/file.jpg")
 
 
 def test_rank_duplicates(image_factory, tmp_path):

@@ -29,18 +29,18 @@ uv sync
 ### Process Media
 ```bash
 # Standard run
-uv run main.py process /path/to/images_videos
+picpurge process /path/to/images_videos
 
 # Dry-run (preview only)
-uv run main.py process /path/to/images_videos --dry-run
+picpurge process /path/to/images_videos --dry-run
 
 # Custom thresholds
-uv run main.py process /path/to/images_videos --blur-threshold 80 --hash-threshold 3
+picpurge process /path/to/images_videos --blur-threshold 80 --hash-threshold 3
 ```
 
 ### Archive for S3
 ```bash
-uv run main.py archive /path/to/images_videos --output collection.zip
+picpurge archive /path/to/images_videos --output collection.zip
 ```
 
 ## 🧪 Testing

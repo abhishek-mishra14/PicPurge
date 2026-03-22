@@ -3,20 +3,19 @@ from PIL import Image
 
 def get_metadata(path: str) -> dict:
     """Extracts resolution, file size, and creation date from a media file."""
-    result = {"width": 0, "height": 0, "file_size": 0, "created": 0.0}
-    try:
-        stat = os.stat(path)
-        result["file_size"] = stat.st_size
-        result["created"] = stat.st_mtime
-    except OSError:
-        return result
+    stat = os.stat(path)
+    file_size = stat.st_size
+    created = stat.st_mtime
 
-    try:
-        with Image.open(path) as img:
-            result["width"], result["height"] = img.size
-    except Exception:
-        pass
-    return result
+    with Image.open(path) as img:
+        width, height = img.size
+
+    return {
+        "width": width,
+        "height": height,
+        "file_size": file_size,
+        "created": created,
+    }
 
 def rank_duplicates(group: list[str]) -> list[str]:
     """Ranks a group of duplicate file paths best-first: highest resolution > largest file > newest."""

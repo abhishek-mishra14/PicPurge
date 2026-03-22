@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from unittest.mock import patch, MagicMock
 
-from src.dedup import analyzer
+from dedup import analyzer
 
 
 # --- Blur Detection ---
@@ -29,7 +29,8 @@ def test_blur_score_heic_fallback(image_factory):
     assert score > 0.0
 
 def test_blur_score_nonexistent_file():
-    assert analyzer.get_blur_score("/nonexistent/file.jpg") == 0.0
+    with pytest.raises(FileNotFoundError):
+        analyzer.get_blur_score("/nonexistent/file.jpg")
 
 
 # --- Image Hashing ---
@@ -45,7 +46,8 @@ def test_image_hash_different(image_factory):
     assert analyzer.get_image_hash(sharp) != analyzer.get_image_hash(blurry)
 
 def test_image_hash_nonexistent():
-    assert analyzer.get_image_hash("/nonexistent/file.jpg") == ""
+    with pytest.raises(FileNotFoundError):
+        analyzer.get_image_hash("/nonexistent/file.jpg")
 
 
 # --- Video Hashing (Mocked) ---
