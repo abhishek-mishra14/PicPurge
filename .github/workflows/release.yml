@@ -37,19 +37,15 @@ jobs:
       - name: Build Wheel
         run: uv build
 
-      - name: Build Standalone Binary (PyApp)
+      - name: Build Standalone Binary (PyInstaller)
         shell: bash
         run: |
-          # Use uvx to run pyapp without manual installation
-          # Environment variables for PyApp
-          export PYAPP_PROJECT_NAME="picpurge"
-          export PYAPP_EXEC_SPEC="picpurge"
+          # Use uvx to run pyinstaller without manual installation
+          # We include the 'src' directory in the path so pyinstaller can find the package
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/src
           
-          # Find the wheel
-          WHEEL_PATH=$(find dist -name "*.whl" | head -n 1)
-          echo "Building with wheel: $WHEEL_PATH"
-          
-          uvx pyapp build "$WHEEL_PATH" -o "${{ matrix.artifact_name }}"
+          uvx --with opencv-python --with pillow --with imagehash --with pillow-heif --with rich --with typer \
+            pyinstaller --onefile --name "${{ matrix.artifact_name }}" main.py
 
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v2
@@ -57,4 +53,4 @@ jobs:
           files: |
             dist/*.whl
             dist/*.tar.gz
-            ${{ matrix.artifact_name }}
+            dist/${{ matrix.artifact_name }}
