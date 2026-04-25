@@ -23,32 +23,46 @@ jobs:
           - os: windows-latest
             artifact_name: picpurge-windows.exe
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
 
+      - name: Sync Version from Tag
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Setting version to $VERSION"
+          # Update pyproject.toml
+          sed -i.bak "s/version = \"0.1.0\"/version = \"$VERSION\"/" pyproject.toml
+          # Update cli.py
+          sed -i.bak "s/__version__ = \"0.1.0\"/__version__ = \"$VERSION\"/" src/picpurge/cli.py
+
       - name: Set up Python
         run: uv python install 3.13
 
-      - name: Build Wheel
+      - name: Build Wheel & Source Dist
+        if: matrix.os == 'ubuntu-latest'
         run: uv build
 
       - name: Build Standalone Binary (PyInstaller)
         shell: bash
         run: |
-          # Use uvx to run pyinstaller without manual installation
-          # We include the 'src' directory in the path so pyinstaller can find the package
-          export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-          
-          uvx --with opencv-python --with pillow --with imagehash --with pillow-heif --with rich --with typer \
-            pyinstaller --onefile --name "${{ matrix.artifact_name }}" main.py
+          uv pip install . pyinstaller
+          uv run pyinstaller --onefile \
+            --collect-all imagehash \
+            --collect-all pillow_heif \
+            --name "${{ matrix.artifact_name }}" \
+            main.py
 
       - name: Upload Release Artifacts
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             dist/*.whl
