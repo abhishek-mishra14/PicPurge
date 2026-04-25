@@ -9,6 +9,21 @@ A high-performance, parallelized media deduplicator for Python 3.14 (GIL-free). 
 - **Perceptual Deduplication**: `imagehash` (pHash) for images; FFmpeg keyframe extraction for videos (HDR/Dolby Vision safe)
 - **EXIF-Aware Ranking**: Duplicates sorted by resolution → file size → date before display
 - **Rich Progress Bar**: Live progress during parallel analysis
+
+## 📥 Installation
+
+### 1. Standalone Binary (Single Click)
+Download the latest pre-built binary for your OS from the [Releases](https://github.com/abhishek-mishra14/PicPurge/releases) page. No Python setup required!
+
+### 2. Using `uv` (Recommended for Devs)
+```bash
+uv tool install picpurge
+```
+
+### 3. Using `pip`
+```bash
+pip install picpurge
+```
 - **Dry-Run Mode**: Preview what would be skipped without moving files
 - **Configurable Thresholds**: `--blur-threshold` and `--hash-threshold` CLI options
 - **Lossless Archiving**: ZIP with integrity verification

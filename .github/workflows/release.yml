@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: picpurge-linux
+          - os: macos-latest
+            artifact_name: picpurge-macos
+          - os: windows-latest
+            artifact_name: picpurge-windows.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Build Wheel
+        run: uv build
+
+      - name: Build Standalone Binary (PyApp)
+        shell: bash
+        run: |
+          # Install PyApp CLI
+          uv tool install pyapp
+          
+          # Environment variables for PyApp
+          export PYAPP_PROJECT_NAME="picpurge"
+          export PYAPP_EXEC_SPEC="picpurge"
+          
+          # Use the built wheel
+          WHEEL_PATH=$(ls dist/*.whl | head -n 1)
+          pyapp build "$WHEEL_PATH" -o "${{ matrix.artifact_name }}"
+
+      - name: Upload Release Artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            ${{ matrix.artifact_name }}
