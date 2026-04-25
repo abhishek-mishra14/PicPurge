@@ -54,6 +54,7 @@ jobs:
       - name: Build Standalone Binary (PyInstaller)
         shell: bash
         run: |
+          uv venv
           uv pip install . pyinstaller
           uv run pyinstaller --onefile \
             --collect-all imagehash \
