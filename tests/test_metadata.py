@@ -1,6 +1,6 @@
 import os
 import pytest
-from dedup import metadata
+from picpurge import metadata
 
 
 def test_get_metadata_image(image_factory):

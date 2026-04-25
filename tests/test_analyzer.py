@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from unittest.mock import patch, MagicMock
 
-from dedup import analyzer
+from picpurge import analyzer
 
 
 # --- Blur Detection ---

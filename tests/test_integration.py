@@ -18,9 +18,9 @@ def test_process_e2e(tmp_path, image_factory):
     shutil.copy(image_factory("b.jpg", mode="sharp"), test_dir / "b.jpg")  # dup of a
     shutil.copy(image_factory("blur.jpg", mode="blurry"), test_dir / "blur.jpg")
 
-    with patch("dedup.ui.prompt_duplicate_resolution") as mock_ui, \
-         patch("dedup.ui.prompt_rejection_confirmation") as mock_reject, \
-         patch("dedup.ui.prompt_skipped_files"):
+    with patch("picpurge.ui.prompt_duplicate_resolution") as mock_ui, \
+         patch("picpurge.ui.prompt_rejection_confirmation") as mock_reject, \
+         patch("picpurge.ui.prompt_skipped_files"):
         mock_ui.side_effect = lambda group, is_dry_run=False: [group[0]]
         mock_reject.return_value = "skip"
         result = runner.invoke(app, ["process", str(test_dir)])
@@ -47,7 +47,7 @@ def test_process_single_file(tmp_path, image_factory):
     d.mkdir()
     shutil.copy(image_factory("only.jpg", mode="sharp"), d / "only.jpg")
 
-    with patch("dedup.ui.prompt_skipped_files"):
+    with patch("picpurge.ui.prompt_skipped_files"):
         result = runner.invoke(app, ["process", str(d)])
     assert result.exit_code == 0
     assert (d / "only.jpg").exists()
@@ -62,8 +62,8 @@ def test_process_dry_run(tmp_path, image_factory):
     shutil.copy(image_factory("b.jpg", mode="sharp"), d / "b.jpg")
     shutil.copy(image_factory("blur.jpg", mode="blurry"), d / "blur.jpg")
 
-    with patch("dedup.ui.prompt_duplicate_resolution") as mock_ui, \
-         patch("dedup.ui.prompt_rejection_confirmation") as mock_reject:
+    with patch("picpurge.ui.prompt_duplicate_resolution") as mock_ui, \
+         patch("picpurge.ui.prompt_rejection_confirmation") as mock_reject:
         mock_ui.side_effect = lambda group, is_dry_run: [group[0]]
         mock_reject.return_value = "skip"
         result = runner.invoke(app, ["process", str(d), "--dry-run"])
@@ -79,8 +79,8 @@ def test_process_custom_thresholds(tmp_path, image_factory):
     d.mkdir()
     shutil.copy(image_factory("a.jpg", mode="sharp"), d / "a.jpg")
 
-    with patch("dedup.ui.prompt_skipped_files"), \
-         patch("dedup.ui.prompt_rejection_confirmation") as mock_reject:
+    with patch("picpurge.ui.prompt_skipped_files"), \
+         patch("picpurge.ui.prompt_rejection_confirmation") as mock_reject:
         mock_reject.return_value = "skip"
         result = runner.invoke(app, ["process", str(d),
                                      "--blur-threshold", "9999",
@@ -120,9 +120,9 @@ def test_process_discard_all(tmp_path, image_factory):
     shutil.copy(image_factory("a.jpg", mode="sharp"), d / "a.jpg")
     shutil.copy(image_factory("b.jpg", mode="sharp"), d / "b.jpg")
 
-    with patch("dedup.ui.prompt_duplicate_resolution") as mock_ui, \
-         patch("dedup.ui.prompt_rejection_confirmation") as mock_reject, \
-         patch("dedup.ui.prompt_skipped_files"):
+    with patch("picpurge.ui.prompt_duplicate_resolution") as mock_ui, \
+         patch("picpurge.ui.prompt_rejection_confirmation") as mock_reject, \
+         patch("picpurge.ui.prompt_skipped_files"):
         # mock_ui returns empty list for 'Discard All'
         mock_ui.return_value = []
         mock_reject.return_value = "skip"
@@ -139,8 +139,8 @@ def test_process_blur_keep_anyway(tmp_path, image_factory):
     d.mkdir()
     shutil.copy(image_factory("blur.jpg", mode="blurry"), d / "blur.jpg")
 
-    with patch("dedup.ui.prompt_rejection_confirmation") as mock_reject, \
-         patch("dedup.ui.prompt_skipped_files"):
+    with patch("picpurge.ui.prompt_rejection_confirmation") as mock_reject, \
+         patch("picpurge.ui.prompt_skipped_files"):
         mock_reject.return_value = "keep"
         runner.invoke(app, ["process", str(d)])
 

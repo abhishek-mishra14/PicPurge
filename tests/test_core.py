@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from dedup import core
+from picpurge import core
 
 
 def test_group_by_hash_near_duplicates():
