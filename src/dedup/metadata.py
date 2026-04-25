@@ -1,6 +1,8 @@
 import os
 from PIL import Image
 
+from concurrent.futures import ThreadPoolExecutor
+
 def get_metadata(path: str) -> dict:
     """Extracts resolution, file size, and creation date from a media file."""
     stat = os.stat(path)
@@ -19,9 +21,12 @@ def get_metadata(path: str) -> dict:
 
 def rank_duplicates(group: list[str]) -> list[str]:
     """Ranks a group of duplicate file paths best-first: highest resolution > largest file > newest."""
-    metas = [(p, get_metadata(p)) for p in group]
+    # Parallelize metadata extraction (high-performance for large groups)
+    with ThreadPoolExecutor() as pool:
+        metas = list(pool.map(lambda p: (p, get_metadata(p)), group))
+        
     metas.sort(key=lambda x: (
-        x[1]["width"] * x[1]["height"],   # resolution (ascending, reversed below)
+        x[1]["width"] * x[1]["height"],   # resolution
         x[1]["file_size"],                 # file size
         x[1]["created"],                   # newest
     ), reverse=True)

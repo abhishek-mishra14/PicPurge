@@ -43,6 +43,28 @@ uv run picpurge process /path/to/images_videos --blur-threshold 80 --hash-thresh
 uv run picpurge archive /path/to/images_videos --output collection.zip
 ```
 
+## 🛠 CLI Reference
+
+### `picpurge process [FOLDER]`
+Scans a directory for duplicates, blurry images, and screenshots.
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `--blur-threshold` | `50.0` | Laplacian variance score. Images below this are moved to `skipped/`. |
+| `--hash-threshold` | `5` | Max Hamming distance for perceptual hashes. Lower = stricter duplicates. |
+| `--dry-run` | `false` | Reports what would happen without moving any files. |
+
+### `picpurge archive [FOLDER]`
+Creates a verified ZIP archive of the processed media.
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `--output`, `-o` | `collection.zip` | The destination path for the ZIP archive. |
+
+### Global Options
+- `--version`, `-v`: Show program version and exit.
+- `--help`: Show help for any command.
+
 ## 🧪 Testing
 ```bash
 uv run python -m pytest tests/ -v
