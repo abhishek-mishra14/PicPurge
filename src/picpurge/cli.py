@@ -145,7 +145,12 @@ def process(
             console.print("[yellow]The process failed fast to prevent inconsistent state.[/yellow]")
             raise typer.Exit(code=1)
 
+    console.print("\n[bold green]Analysis complete.[/bold green]")
+
     # Rejection confirmation (blurry/screenshots)
+    if auto_skipped:
+        console.print(f"Checking [bold]{len(auto_skipped)}[/bold] blurry/screenshot files...")
+    
     confirmed_skipped: list[str] = []
     skip_all = False
     for path, reason in auto_skipped:
@@ -162,7 +167,11 @@ def process(
         # if 'keep', we do nothing and the file stays in place
 
     # Duplicate grouping
+    console.print("Checking for duplicates...")
     groups = core.group_identical_or_near(hashes_dict, hash_threshold)
+    
+    if groups:
+        console.print(f"Found [bold]{len(groups)}[/bold] groups of duplicates.")
 
     dup_skipped: list[str] = []
     for group in groups:
