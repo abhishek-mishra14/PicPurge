@@ -131,7 +131,13 @@ def process(
     ) as progress:
         task = progress.add_task("Analyzing", total=len(all_files))
         try:
-            with ThreadPoolExecutor() as pool:
+            # 2x CPU count: workload is mostly I/O-bound (disk reads + ffmpeg subprocesses).
+            # OpenCV and FFmpeg both release the GIL, so threads are cheaper and more
+            # effective than processes here. Extra threads keep the CPU busy while others
+            # wait on disk or subprocess completion.
+            max_workers = (os.cpu_count() or 4) * 4
+            
+            with ThreadPoolExecutor(max_workers=max_workers) as pool:
                 futures = {pool.submit(process_file, f, blur_threshold): f for f in all_files}
                 for future in as_completed(futures):
                     path, reason, file_hash = future.result()

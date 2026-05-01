@@ -42,43 +42,53 @@ def get_image_hash(image_path: str) -> str:
 
 def get_video_hashes(video_path: str) -> list[str]:
     """Extracts 3 keyframes (10%, 50%, 90%) via FFmpeg and returns their hashes."""
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-show_entries",
-        "format=duration",
-        "-of",
-        "default=noprint_wrappers=1:nokey=1",
-        video_path,
-    ]
-    duration_str = subprocess.check_output(cmd).decode().strip()
-    duration = float(duration_str)
+    try:
+        cmd = [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            video_path,
+        ]
+        duration_str = subprocess.check_output(cmd).decode().strip()
+        duration = float(duration_str)
+    except Exception:
+        return []
 
     timestamps = [duration * 0.1, duration * 0.5, duration * 0.9]
     hashes = []
 
     for ts in timestamps:
         with tempfile.NamedTemporaryFile(suffix=".jpg") as tmp:
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-ss",
-                    str(ts),
-                    "-i",
-                    video_path,
-                    "-vframes",
-                    "1",
-                    "-f",
-                    "image2",
-                    tmp.name,
-                ],
-                capture_output=True,
-                check=True,
-            )
-            with Image.open(tmp.name) as img:
-                hashes.append(str(imagehash.phash(img)))
+            try:
+                # Use output seeking (-ss after -i) for better reliability with short videos.
+                # Use -pix_fmt yuvj420p to handle HEVC/color-range issues with the mjpeg encoder.
+                subprocess.run(
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        video_path,
+                        "-ss",
+                        str(ts),
+                        "-vframes",
+                        "1",
+                        "-f",
+                        "image2",
+                        "-pix_fmt",
+                        "yuvj420p",
+                        tmp.name,
+                    ],
+                    capture_output=True,
+                    check=True,
+                )
+                with Image.open(tmp.name) as img:
+                    hashes.append(str(imagehash.phash(img)))
+            except Exception:
+                continue  # Skip this frame if it fails
     return hashes
 
 
